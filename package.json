@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "verify": "node scripts/verify.mjs",
     "qa": "node scripts/qa.mjs",
-    "labels": "node scripts/labels.mjs"
+    "labels": "node scripts/labels.mjs",
+    "deploy": "npm run build && node scripts/deploy.mjs pages"
   },
   "dependencies": {
     "katex": "^0.16.11",

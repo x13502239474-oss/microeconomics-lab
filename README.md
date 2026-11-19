@@ -59,9 +59,10 @@ npm run labels     # 全站图表文字重叠检测
 构建产物在 `dist/`，通过 `gh-pages` 分支发布：
 
 ```bash
-npm run build
-GH_TOKEN=<你的 token> node scripts/deploy.mjs pages
+GH_TOKEN=<你的 token> npm run deploy
 ```
+
+`npm run deploy` 会先构建，再用 `scripts/deploy.mjs` 走 Git Data API 把 `dist/` 提交到 `gh-pages`。用 API 而不是 `git push`，是因为本机 git 到 `github.com` 的 443 连接被环境代理拦断（`CONNECT tunnel failed, response 502`），而 REST API 通路正常。
 
 `base: './'` 配合 HashRouter，静态托管无需额外的路由回退配置。
 
