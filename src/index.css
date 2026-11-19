@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #f6f2e9;
+  --surface: #fffcf5;
+  --ink: #12263f;
+  --line: #dcd3c2;
+  --copper: #9c7a4a;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    background-image:
+      radial-gradient(circle at 18% -10%, rgba(156, 122, 74, 0.07), transparent 45%),
+      radial-gradient(circle at 92% 4%, rgba(22, 50, 79, 0.05), transparent 40%);
+    background-attachment: fixed;
+  }
+  ::selection {
+    background: rgba(156, 122, 74, 0.22);
+  }
+  h1, h2, h3, h4 {
+    @apply font-serif;
+    text-wrap: balance;
+  }
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  input, textarea, select {
+    font: inherit;
+    color: inherit;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cfc4b0 transparent;
+  }
+}
+
+@layer components {
+  .shell {
+    @apply mx-auto w-full max-w-[1180px] px-5 sm:px-8;
+  }
+  .eyebrow {
+    @apply font-mono text-[10px] uppercase tracking-[0.22em] text-copper;
+  }
+  .meta {
+    @apply font-mono text-[11px] tracking-[0.08em] text-muted;
+  }
+  .rule {
+    @apply border-t border-line;
+  }
+  .card {
+    @apply border border-line bg-surface;
+  }
+  .card-quiet {
+    @apply border border-linesoft bg-[#FBF7EE];
+  }
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 border px-4 py-2.5 text-[13px] tracking-wide transition-colors duration-150 disabled:cursor-not-allowed;
+  }
+  .btn:disabled {
+    border-color: #dcd3c2;
+    background: #e9e2d4;
+    color: #8b97a5;
+  }
+  .btn-primary {
+    @apply btn border-navy bg-navy text-paper hover:bg-navy2;
+  }
+  .btn-outline {
+    @apply btn border-line bg-transparent text-ink hover:border-navy hover:bg-[#F1EBDD];
+  }
+  .btn-ghost {
+    @apply btn border-transparent bg-transparent text-navy2 hover:bg-[#EFE8D9];
+  }
+  .btn-copper {
+    @apply btn border-copper bg-copper text-[#FFFCF5] hover:bg-[#8A6A3E];
+  }
+  .chip {
+    @apply inline-flex items-center border border-line px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted;
+  }
+  .field {
+    @apply w-full border border-line bg-[#FFFDF8] px-3 py-2 text-[14px] outline-none focus:border-navy;
+  }
+  .tabnum {
+    font-variant-numeric: tabular-nums;
+  }
+  .prose-body p {
+    @apply text-[15px] leading-[1.95] text-ink2 sm:text-[16px];
+  }
+  .prose-body strong {
+    @apply font-semibold text-ink;
+  }
+}
+
+/* KaTeX: 与纸面排版贴合 */
+.katex {
+  font-size: 1.06em;
+  color: var(--ink);
+}
+.katex-display {
+  margin: 0.9rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+
+/* 自定义滑杆 */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  height: 2px;
+  background: #d7cdba;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -6px;
+  border-radius: 999px;
+  background: #16324f;
+  border: 2px solid #fffcf5;
+  box-shadow: 0 0 0 1px #16324f;
+}
+input[type='range']::-moz-range-track {
+  height: 2px;
+  background: #d7cdba;
+}
+input[type='range']::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #16324f;
+  border: 2px solid #fffcf5;
+}
+
+.fade-in {
+  animation: fadeIn 0.28s ease-out both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 移动端底部安全区 */
+.pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.9rem);
+}
+@media (min-width: 1024px) {
+  .pb-safe {
+    padding-bottom: 3rem;
+  }
+}
