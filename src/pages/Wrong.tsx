@@ -11,6 +11,7 @@ export default function Wrong() {
   const { state, removeAttempt } = useStore()
   const [stage, setStage] = useState(0)
   const [lessonId, setLessonId] = useState('')
+  const [minCount, setMinCount] = useState(0)
   const [sort, setSort] = useState<'count' | 'recent'>('count')
   const [q, setQ] = useState('')
   const [open, setOpen] = useState<string | null>(null)
@@ -21,9 +22,20 @@ export default function Wrong() {
   const filtered = useMemo(() => {
     let list = all.filter((a) => (stage ? a.stage === stage : true))
     if (lessonId) list = list.filter((a) => a.lessonId === lessonId)
+    if (minCount > 0) list = list.filter((a) => a.wrongCount >= minCount)
     if (q.trim()) list = list.filter((a) => a.stem.includes(q.trim()))
     return list.sort((a, b) => (sort === 'count' ? b.wrongCount - a.wrongCount : b.lastAt - a.lastAt))
-  }, [all, stage, lessonId, sort, q])
+  }, [all, stage, lessonId, minCount, sort, q])
+
+  // 按教材章节分组统计（用于右侧概览）
+  const byChapter = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const a of all) {
+      const ch = getLesson(a.lessonId)?.chapter || '其他'
+      map.set(ch, (map.get(ch) || 0) + 1)
+    }
+    return [...map.entries()].sort((a, b) => b[1] - a[1])
+  }, [all])
 
   const openItem = (key: string) => {
     setOpen(key)
@@ -67,7 +79,7 @@ export default function Wrong() {
         </div>
       </header>
 
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:items-center">
         <select value={stage} onChange={(e) => { setStage(Number(e.target.value)); setLessonId('') }} className="field py-1.5 text-[12px] sm:w-[130px]">
           <option value={0}>全部阶段</option>
           {stages.map((s) => (
@@ -90,8 +102,28 @@ export default function Wrong() {
           <option value="count">按错误次数</option>
           <option value="recent">按最近作答</option>
         </select>
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="搜索题干" className="field py-1.5 text-[12px] sm:ml-auto sm:w-[200px]" />
+        <select value={minCount} onChange={(e) => setMinCount(Number(e.target.value))} className="field py-1.5 text-[12px] sm:w-[150px]">
+          <option value={0}>全部错题</option>
+          <option value={2}>错 ≥2 次</option>
+          <option value={3}>错 ≥3 次</option>
+          <option value={5}>错 ≥5 次</option>
+        </select>
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="搜索题干" className="field col-span-2 py-1.5 text-[12px] sm:ml-auto sm:w-[200px]" />
       </div>
+
+      {all.length > 0 && (
+        <div className="mt-4 border border-linesoft bg-[#FBF7EE] px-4 py-3">
+          <div className="meta">按教材章节分布</div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {byChapter.map(([ch, n]) => (
+              <span key={ch} className="inline-flex items-center gap-1.5 border border-line bg-surface px-2 py-1 text-[11px] text-ink2">
+                <span className="text-muted">{ch}</span>
+                <span className="tabnum font-mono text-[11px] text-oxblood">{n}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 space-y-3">
         {filtered.map((a) => {

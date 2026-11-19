@@ -3,11 +3,10 @@
  * 通过 GitHub Git Data API 提交并推送（适用于 git 传输被拦截的环境）。
  *
  * 用法：
- *   GH_TOKEN=xxx node scripts/deploy.mjs main    # 提交源码（取 git ls-files）
- *   GH_TOKEN=xxx node scripts/deploy.mjs pages    # 提交 dist/ 到 gh-pages
+ *   node scripts/deploy.mjs main    # 提交源码（取 git ls-files）
+ *   node scripts/deploy.mjs pages   # 提交 dist/ 到 gh-pages
  *
- * 环境变量：
- *   GH_TOKEN  必填，需要 repo 权限
+ * 凭据：优先读环境变量 GH_TOKEN，没有则读项目根目录的 .deploy.env（已 gitignore）
  *   GH_REPO   默认 x13502239474-oss/microeconomics-lab
  *   GH_MSG    可选，提交信息
  */
@@ -15,12 +14,28 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 
+// 读取 .deploy.env（简单 KEY=VALUE，忽略注释与空行）
+function loadEnvFile() {
+  const file = path.resolve('.deploy.env')
+  if (!fs.existsSync(file)) return
+  for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
+    const s = line.trim()
+    if (!s || s.startsWith('#')) continue
+    const eq = s.indexOf('=')
+    if (eq < 0) continue
+    const key = s.slice(0, eq).trim()
+    const val = s.slice(eq + 1).trim().replace(/^["']|["']$/g, '')
+    if (!process.env[key]) process.env[key] = val
+  }
+}
+loadEnvFile()
+
 const TOKEN = process.env.GH_TOKEN
 const REPO = process.env.GH_REPO || 'x13502239474-oss/microeconomics-lab'
 const TARGET = process.argv[2] || 'main'
 
 if (!TOKEN) {
-  console.error('缺少 GH_TOKEN')
+  console.error('缺少 GH_TOKEN：请设置环境变量，或写入 .deploy.env')
   process.exit(1)
 }
 
